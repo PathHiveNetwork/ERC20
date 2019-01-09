@@ -82,7 +82,6 @@ contract PathHiveNetwork is Role, ERC20 {
         require(to != address(0));
         require(amount > 0);
         require(_balances[from] >= amount);
-        require(amount <= _allowed[from][msg.sender]);
 
         _allowed[from][msg.sender] = _allowed[from][msg.sender].sub(value);
         _transfer(from, to, value);
