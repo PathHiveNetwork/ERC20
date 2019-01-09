@@ -71,7 +71,7 @@ contract Role is Ownable {
     function addPauser(address account) public onlyOwner {
         require(!isAdminister(account));
         require(!isPauser(account));
-        if (account == owner) { revert(); }
+        require(account != owner);
         adminGroup.pausers[account] = true;
         adminGroup.pauserListIndex[account] = adminGroup.pauserList.push(account)-1;
         emit PauserAdded(account);

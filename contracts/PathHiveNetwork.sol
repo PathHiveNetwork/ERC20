@@ -56,18 +56,23 @@ contract PathHiveNetwork is Role, ERC20 {
         return _balances[who];
     }
 
+    function _transfer(address from, address to, uint256 amount) internal {
+        require(to != address(0));
+
+        _balances[from] = _balances[from].sub(amount);
+        _balances[to] = _balances[to].add(amount);
+        emit Transfer(from, to, amount);
+    }
+
     function transfer(address to, uint256 amount) public whenNotPaused returns (bool) {
         require(!_frozenAccount[msg.sender]);
         require(!_frozenAccount[to]);
         require(msg.sender != to);
         require(to != address(0));
         require(_balances[msg.sender] >= amount);
-        require(amount!=0);
         require(amount > 0);
 
-        _balances[msg.sender] = _balances[msg.sender].sub(amount);
-        _balances[to] = _balances[to].add(amount);
-        emit Transfer(msg.sender, to, amount);
+        _transfer(msg.sender, to, value);
         return true;
     }
 
@@ -75,16 +80,13 @@ contract PathHiveNetwork is Role, ERC20 {
         require(!_frozenAccount[from]);
         require(!_frozenAccount[to]);
         require(to != address(0));
-        require(amount!=0);
         require(amount > 0);
         require(_balances[from] >= amount);
-
         require(amount <= _allowed[from][msg.sender]);
 
-        _balances[from] = _balances[from].sub(amount);
-        _balances[to] = _balances[to].add(amount);
-        _allowed[from][msg.sender] = _allowed[from][msg.sender].sub(amount);
-        emit Transfer(from, to, amount);
+        _allowed[from][msg.sender] = _allowed[from][msg.sender].sub(value);
+        _transfer(from, to, value);
+        emit Approval(from, msg.sender, _allowed[from][msg.sender]);
         return true;
     }
 
@@ -120,7 +122,7 @@ contract PathHiveNetwork is Role, ERC20 {
 
     function burn(address to, uint256 amount) onlyOwner public returns (bool){
         require(amount > 0);
-        require(to != 0);
+        require(to != address(0));
         require(amount <= _balances[to]);
 
         _totalSupply = _totalSupply.sub(amount);
@@ -130,7 +132,7 @@ contract PathHiveNetwork is Role, ERC20 {
     }
 
     function mint(address to, uint256 amount) public administerAndAbove returns (bool){
-        require(to != 0);
+        require(to != address(0));
         require(amount > 0);
         _totalSupply = _totalSupply.add(amount);
         _balances[to] = _balances[to].add(amount);
