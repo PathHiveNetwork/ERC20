@@ -13,6 +13,7 @@ contract Proxy is Role {
     }
 
     function upgradeTo(address newContractAddress) public administerAndAbove {
+        require(newContractAddress != address(0));
         _linkedContractAddress = newContractAddress;
         emit Upgraded(newContractAddress);
     }
