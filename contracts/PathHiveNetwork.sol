@@ -13,6 +13,7 @@ contract PathHiveNetwork is Role, ERC20 {
     mapping (address => uint) private _frozenAccountIndex;
     address[] private _frozenAccountList;
     uint256 private _totalSupply;
+    uint256 private _maxSupply;
 
     bool private _paused = false;
 
@@ -69,7 +70,6 @@ contract PathHiveNetwork is Role, ERC20 {
         require(!_frozenAccount[to]);
         require(msg.sender != to);
         require(to != address(0));
-        require(_balances[msg.sender] >= amount);
         require(amount > 0);
 
         _transfer(msg.sender, to, amount);
@@ -81,7 +81,6 @@ contract PathHiveNetwork is Role, ERC20 {
         require(!_frozenAccount[to]);
         require(to != address(0));
         require(amount > 0);
-        require(_balances[from] >= amount);
 
         _allowed[from][msg.sender] = _allowed[from][msg.sender].sub(amount);
         _transfer(from, to, amount);
@@ -133,6 +132,8 @@ contract PathHiveNetwork is Role, ERC20 {
     function mint(address to, uint256 amount) public administerAndAbove returns (bool){
         require(to != address(0));
         require(amount > 0);
+        require(_totalSupply.add(amount) <= 3500000000  * (10 ** uint256(18)));
+
         _totalSupply = _totalSupply.add(amount);
         _balances[to] = _balances[to].add(amount);
         emit Transfer(address(0), to, amount);
