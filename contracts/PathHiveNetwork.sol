@@ -13,7 +13,6 @@ contract PathHiveNetwork is Role, ERC20 {
     mapping (address => uint) private _frozenAccountIndex;
     address[] private _frozenAccountList;
     uint256 private _totalSupply;
-    uint256 private _maxSupply;
 
     bool private _paused = false;
 
